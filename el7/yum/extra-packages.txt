@@ -1,0 +1,25 @@
+# Extra packages
+acpid
+git
+glances
+iperf3
+iptables-services
+lftp
+links
+lynis
+mtools
+ncftp
+nmap
+ntfs-3g
+ntfsprogs
+python2-speedtest-cli
+psmisc
+recode
+rtorrent
+screen
+setroubleshoot-server
+tmux
+tree
+usbutils
+whois
+

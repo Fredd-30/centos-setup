@@ -1,0 +1,5 @@
+# Useless packages
+chrony
+firewalld
+iperf
+NetworkManager-libnm

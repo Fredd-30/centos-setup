@@ -1,0 +1,33 @@
+# /root/.bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+  . /etc/bashrc
+fi
+ 
+# LANG
+LANG=en_US.UTF8
+export LANG
+
+# Alias
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias ll='ls -al'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias vi='vim'
+
+# PS1
+RED='\[\033[0;33m\]'
+WHITE='\[\033[1;37m\]'
+NC='\[\033[0m\]'
+PS1="$RED[$WHITE\u$NC@$WHITE\h$NC:$WHITE\W$RED] #$NC "
+
+# Vim
+EDITOR=vim
+VISUAL=$EDITOR
+export EDITOR VISUAL
+
+# Git
+unset SSH_ASKPASS
