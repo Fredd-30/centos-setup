@@ -13,6 +13,9 @@ CWD=$(pwd)
 # Defined users
 USERS="$(ls -A /home)"
 
+# Admin user
+ADMIN="microlinux"
+
 # Remove these packages
 CRUFT=$(egrep -v '(^\#)|(^\s+$)' ${CWD}/${VERSION}/yum/useless-packages.txt)
 
@@ -62,6 +65,13 @@ configure_shell() {
   # Set english as main system language.
   echo 'Configuring system locale.'
   localectl set-locale LANG=en_US.UTF8
+  # Admin user can manage logs
+  if ! getent group systemd-journal | grep ${ADMIN} > /dev/null 2>&1
+  then
+    echo "Adding user ${ADMIN} to systemd-journal group."
+    usermod -a -G systemd-journal ${ADMIN}
+  fi
+  # Set console resolution
   if [ -f /boot/grub2/grub.cfg ]
   then
     echo 'Configuring console resolution.'
