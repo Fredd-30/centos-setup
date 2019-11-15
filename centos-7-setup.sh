@@ -36,7 +36,7 @@ usage() {
   echo 'Options:'
   echo '  -1, --shell    Configure Bash and Vim.'
   echo '  -2, --repos    Setup official and third-party repositories.'
-  echo '  -3, --extra    Install a complete set of basic tools.'
+  echo '  -3, --extra    Install enhanced base system.'
   echo '  -4, --prune    Remove useless packages.'
   echo '  -h, --help     Show this message.'
 }
@@ -127,12 +127,21 @@ configure_repos() {
 install_extras() {
   echo 'Installing core packages.' 
   yum -y group install "Core" >> ${LOG} 2>&1
+  echo 'All core packages installed on the system.'
   echo 'Installing base packages.'
   echo 'This might take a moment...'
   yum -y group install "Base" >> ${LOG} 2>&1
+  echo 'All base packages installed on the system.'
   echo 'Installing extra packages.'
-  echo 'This might also take a moment...'
-  yum -y install ${EXTRA} >> ${LOG} 2>&1
+  for PACKAGE in ${EXTRA}
+  do
+    if ! rpm -q ${PACKAGE} > /dev/null 2>&1
+    then
+      echo "Installing package: ${PACKAGE}"
+      yum -y install ${PACKAGE} >> ${LOG} 2>&1
+    fi
+  done
+  echo 'All extra packages installed on the system.'
 }
 
 remove_cruft() {
@@ -151,6 +160,44 @@ remove_cruft() {
     fi
   done
   echo 'All useless packages removed from the system.'
+}
+
+strip_system() {
+  # Remove all packages that are not part of the enhanced base system.
+  echo 'Stripping system.'
+  local TMP='/tmp'
+  local PKGLIST="${TMP}/pkglist"
+  local PKGINFO="${TMP}/pkg_base"
+  rpm -qa --queryformat '%{NAME}\n' | sort > ${PKGLIST}
+  PACKAGES=$(egrep -v '(^\#)|(^\s+$)' $PKGLIST)
+  rm -rf ${PKGLIST} ${PKGINFO}
+  mkdir ${PKGINFO}
+  unset REMOVE
+  echo 'Creating database.'
+  BASE=$(egrep -v '(^\#)|(^\s+$)' ${CWD}/${VERSION}/yum/base.txt)
+  for PACKAGE in ${BASE}
+  do
+    touch ${PKGINFO}/${PACKAGE}
+  done
+  for PACKAGE in ${PACKAGES}
+  do
+    if [ -r ${PKGINFO}/${PACKAGE} ]
+    then
+      continue
+    else
+      REMOVE="${REMOVE} ${PACKAGE}"
+    fi
+  done
+  if [ ! -z "${REMOVE}" ]
+  then
+    for PACKAGE in ${REMOVE}
+    do
+      echo "Removing package: ${PACKAGE}"
+      yum -y remove ${PACKAGE} >> ${LOG} 2>&1
+    done
+  fi
+  install_extras
+  rm -rf ${PKGLIST} ${PKGINFO}
 }
 
 # Make sure the script is being executed with superuser privileges.
@@ -179,6 +226,9 @@ case "${OPTION}" in
     ;;
   -4|--prune) 
     remove_cruft
+    ;;
+  -0|--strip) 
+    strip_system
     ;;
   -h|--help) 
     usage
