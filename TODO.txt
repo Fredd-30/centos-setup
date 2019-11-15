@@ -1,0 +1,7 @@
+TODO
+----
+
+  * Persistent sudo
+  * Admin user can use journalctl
+  * Disable IPv6
+  * Enable NAT

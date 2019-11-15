@@ -34,7 +34,7 @@ usage() {
   echo "Usage: ${0} OPTION"
   echo 'CentOS 7.x post-install configuration for servers.'
   echo 'Options:'
-  echo '  -1, --shell    Configure Bash and Vim.'
+  echo '  -1, --shell    Configure shell: Bash, Vim, console, etc.'
   echo '  -2, --repos    Setup official and third-party repositories.'
   echo '  -3, --extra    Install enhanced base system.'
   echo '  -4, --prune    Remove useless packages.'
