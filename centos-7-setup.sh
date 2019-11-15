@@ -192,11 +192,16 @@ strip_system() {
   then
     for PACKAGE in ${REMOVE}
     do
-      echo "Removing package: ${PACKAGE}"
-      yum -y remove ${PACKAGE} >> ${LOG} 2>&1
+      if rpm -q ${PACKAGE} > /dev/null 2>&1
+      then
+        echo "Removing package: ${PACKAGE}"
+        yum -y remove ${PACKAGE} >> ${LOG} 2>&1
+      fi
     done
   fi
+  configure_repos
   install_extras
+  remove_cruft
   rm -rf ${PKGLIST} ${PKGINFO}
 }
 
