@@ -135,14 +135,14 @@ configure_repos() {
 }
 
 install_extras() {
-  echo 'Installing core packages.' 
+  echo 'Fetching missing packages from Core package group.' 
   yum -y group install "Core" >> ${LOG} 2>&1
-  echo 'All core packages installed on the system.'
-  echo 'Installing base packages.'
+  echo 'Core package group installed on the system.'
+  echo 'Installing Base package group.'
   echo 'This might take a moment...'
   yum -y group install "Base" >> ${LOG} 2>&1
-  echo 'All base packages installed on the system.'
-  echo 'Installing extra packages.'
+  echo 'Base package group installed on the system.'
+  echo 'Installing some additional packages.'
   for PACKAGE in ${EXTRA}
   do
     if ! rpm -q ${PACKAGE} > /dev/null 2>&1
@@ -151,7 +151,7 @@ install_extras() {
       yum -y install ${PACKAGE} >> ${LOG} 2>&1
     fi
   done
-  echo 'All extra packages installed on the system.'
+  echo 'All additional packages installed on the system.'
 }
 
 remove_cruft() {
