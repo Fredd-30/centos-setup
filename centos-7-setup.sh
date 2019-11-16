@@ -14,7 +14,7 @@ CWD=$(pwd)
 USERS="$(ls -A /home)"
 
 # Admin user
-ADMIN="microlinux"
+ADMIN=$(getent passwd 1000 | cut -d: -f 1)
 
 # Remove these packages
 CRUFT=$(egrep -v '(^\#)|(^\s+$)' ${CWD}/${VERSION}/yum/useless-packages.txt)
@@ -41,6 +41,7 @@ usage() {
   echo '  -2, --repos    Setup official and third-party repositories.'
   echo '  -3, --extra    Install enhanced base system.'
   echo '  -4, --prune    Remove useless packages.'
+  echo '  -5, --logs     Enable admin user to access system logs.'
   echo '  -h, --help     Show this message.'
 }
 
@@ -65,12 +66,6 @@ configure_shell() {
   # Set english as main system language.
   echo 'Configuring system locale.'
   localectl set-locale LANG=en_US.UTF8
-  # Admin user can manage logs
-  if ! getent group systemd-journal | grep ${ADMIN} > /dev/null 2>&1
-  then
-    echo "Adding user ${ADMIN} to systemd-journal group."
-    usermod -a -G systemd-journal ${ADMIN}
-  fi
   # Set console resolution
   if [ -f /boot/grub2/grub.cfg ]
   then
@@ -172,6 +167,20 @@ remove_cruft() {
   echo 'All useless packages removed from the system.'
 }
 
+configure_logs() {
+  # Admin user can access system logs
+  if [ ! -z "${ADMIN}" ]
+  then
+    if getent group systemd-journal | grep ${ADMIN} > /dev/null 2>&1
+    then
+      echo "Admin user ${ADMIN} is already a member of the systemd-journal group."
+    else
+      echo "Adding admin user ${ADMIN} to systemd-journal group."
+      usermod -a -G systemd-journal ${ADMIN}
+    fi
+  fi
+}
+
 strip_system() {
   # Remove all packages that are not part of the enhanced base system.
   echo 'Stripping system.'
@@ -241,6 +250,9 @@ case "${OPTION}" in
     ;;
   -4|--prune) 
     remove_cruft
+    ;;
+  -5|--logs) 
+    configure_logs
     ;;
   -0|--strip) 
     strip_system
