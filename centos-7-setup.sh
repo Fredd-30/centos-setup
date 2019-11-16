@@ -181,6 +181,30 @@ configure_logs() {
   fi
 }
 
+disable_ipv6() {
+  # Disable IPv6
+  echo 'Disabling IPv6.'
+  cat ${CWD}/${VERSION}/sysctl.d/disable-ipv6.conf > /etc/sysctl.d/disable-ipv6.conf
+  sysctl -p --load /etc/sysctl.d/disable-ipv6.conf >> $LOG 2>&1
+  # Reconfigure SSH 
+  if [ -f /etc/ssh/sshd_config ]
+  then
+    echo 'Configuring SSH server for IPv4 only.'
+    sed -i -e 's/#AddressFamily any/AddressFamily inet/g' /etc/ssh/sshd_config
+    sed -i -e 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/g' /etc/ssh/sshd_config
+  fi
+  # Reconfigure Postfix
+  if [ -f /etc/postfix/main.cf ]
+  then
+    echo 'Configuring Postfix server for IPv4 only.'
+    sed -i -e 's/inet_protocols = all/inet_protocols = ipv4/g' /etc/postfix/main.cf
+    systemctl restart postfix
+  fi
+  # Rebuild initrd
+  echo 'Rebuilding initial ramdisk.'
+  dracut -f -v >> $LOG 2>&1
+}
+
 strip_system() {
   # Remove all packages that are not part of the enhanced base system.
   echo 'Stripping system.'
@@ -253,6 +277,9 @@ case "${OPTION}" in
     ;;
   -5|--logs) 
     configure_logs
+    ;;
+  -6|--ipv4) 
+    disable_ipv6
     ;;
   -0|--strip) 
     strip_system

@@ -2,5 +2,4 @@ TODO
 ----
 
   * Persistent sudo
-  * Disable IPv6
   * Enable NAT
