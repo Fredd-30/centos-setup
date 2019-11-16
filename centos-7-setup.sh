@@ -136,10 +136,12 @@ configure_repos() {
 
 install_extras() {
   echo 'Fetching missing packages from Core package group.' 
+  yum group mark remove "Core" >> ${LOG} 2>&1
   yum -y group install "Core" >> ${LOG} 2>&1
   echo 'Core package group installed on the system.'
   echo 'Installing Base package group.'
   echo 'This might take a moment...'
+  yum group mark remove "Base" >> ${LOG} 2>&1
   yum -y group install "Base" >> ${LOG} 2>&1
   echo 'Base package group installed on the system.'
   echo 'Installing some additional packages.'
