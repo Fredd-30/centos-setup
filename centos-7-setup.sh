@@ -42,7 +42,12 @@ usage() {
   echo '  -3, --extra    Install enhanced base system.'
   echo '  -4, --prune    Remove useless packages.'
   echo '  -5, --logs     Enable admin user to access system logs.'
+  echo '  -6, --ipv4     Disable IPv6 and reconfigure basic services.'
+  echo '  -7, --sudo     Configure persistent password for sudo.'
+  echo '  -8, --setup    Perform all of the above in one go.'
+  echo '  -9, --nat      Enable packet forwarding.'
   echo '  -h, --help     Show this message.'
+  echo "Logs are written to ${LOG}."
 }
 
 configure_shell() {
@@ -205,6 +210,27 @@ disable_ipv6() {
   dracut -f -v >> $LOG 2>&1
 }
 
+configure_sudo() {
+  # Configure persistent password for sudo.
+  if grep timestamp_timeout /etc/sudoers > /dev/null 2>&1
+  then
+    echo 'Persistent password for sudo already configured.'
+  else
+    echo 'Configuring persistent password for sudo.'
+    echo >> /etc/sudoers
+    echo '# Timeout' >> /etc/sudoers
+    echo 'Defaults timestamp_timeout=-1' >> /etc/sudoers
+  fi
+}
+
+enable_nat() {
+  # Enable packet forwarding.
+  echo 'Enabling packet forwarding.'
+  cat ${CWD}/${VERSION}/sysctl.d/enable-ip-forwarding.conf > \
+    /etc/sysctl.d/enable-ip-forwarding.conf
+  sysctl -p --load /etc/sysctl.d/enable-ip-forwarding.conf >> $LOG 2>&1
+}
+
 strip_system() {
   # Remove all packages that are not part of the enhanced base system.
   echo 'Stripping system.'
@@ -280,6 +306,21 @@ case "${OPTION}" in
     ;;
   -6|--ipv4) 
     disable_ipv6
+    ;;
+  -7|--sudo) 
+    configure_sudo
+    ;;
+  -8|--setup) 
+    configure_shell
+    configure_repos
+    install_extras
+    remove_cruft
+    configure_logs
+    disable_ipv6
+    configure_sudo
+    ;;
+  -9|--nat) 
+    enable_nat
     ;;
   -0|--strip) 
     strip_system

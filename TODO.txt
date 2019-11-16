@@ -1,5 +1,0 @@
-TODO
-----
-
-  * Persistent sudo
-  * Enable NAT
