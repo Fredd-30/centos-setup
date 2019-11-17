@@ -53,50 +53,73 @@ The `centos-7-setup.sh` script performs all of these operations.
 
 Configure Bash and Vim and set a more readable default console resolution:
 
+```
 # ./centos-7-setup.sh --shell
+```
 
 Setup official and third-party repositories:
 
+```
 # ./centos-7-setup.sh --repos
+```
 
 Install the Core and Base package groups along with some extra tools:
 
+```
 # ./centos-7-setup.sh --extra
+```
 
 Remove a handful of unneeded packages:
 
+```
 # ./centos-7-setup.sh --prune
+```
 
 Enable the admin user to access system logs:
 
+```
 # ./centos-7-setup.sh --logs
+```
 
 Disable IPv6 and reconfigure basic services accordingly:
 
+```
 # ./centos-7-setup.sh --ipv4
+```
 
 Configure password persistence for sudo:
 
+```
 # ./centos-7-setup.sh --sudo
+```
 
 Perform all of the above in one go:
 
+```
 # ./centos-7-setup.sh --setup
+```
 
 Enable packet forwarding:
 
+```
 # ./centos-7-setup.sh --nat
+```
 
 Strip packages and revert back to an enhanced base system:
 
+```
 # ./centos-7-setup.sh --strip
+```
 
 Display help message:
 
+```
 # ./centos-7-setup.sh --help
+```
 
 If you want to know what exactly goes on under the hood, open a second terminal
 and view the logs:
+
 ```
 $ tail -f /tmp/centos-7-setup.log
 ```
