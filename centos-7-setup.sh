@@ -46,6 +46,7 @@ usage() {
   echo '  -7, --sudo     Configure persistent password for sudo.'
   echo '  -8, --setup    Perform all of the above in one go.'
   echo '  -9, --nat      Enable packet forwarding.'
+  echo '  -0, --strip    Revert back to enhanced base system.'
   echo '  -h, --help     Show this message.'
   echo "Logs are written to ${LOG}."
 }
